@@ -1,29 +1,50 @@
-import numpy as np
 import cv2
+import numpy as np
+import matplotlib.pyplot as plt
 
-# We point OpenCV's CascadeClassifier function to where our
-# classifier (XML file format) is stored, remember to keep the code and classifier in the same folder
-face_cascade= cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
+MIN_MATCH_COUNT = 20
 
-# Load our image then convert it to grayscale
-image = cv2.imread('../InputData/original_image.png')
-gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+detector=cv2.xfeatures2d.SIFT_create()
 
-# Our classifier returns the ROI of the detected face as a tuple
-# It stores the top left coordinate and the bottom right coordinates
-# it returns the list of lists, which are the location of different faces detected.
-faces = face_cascade.detectMultiScale(gray, 1.3, 5)
+FLANN_INDEX_KDITREE=0
+flannParam=dict(algorithm=FLANN_INDEX_KDITREE,tree=5)
+flann=cv2.FlannBasedMatcher(flannParam,{})
 
-# When no faces detected, face_classifier returns and empty tuple
-if faces is ():
-    print("No faces found")
+trainImg=cv2.imread("../InputData/template_image.png",0)
+trainKP,trainDesc=detector.detectAndCompute(trainImg,None)
+trainImg1=cv2.drawKeypoints(trainImg,trainKP,None,(255,0,0),4)
+plt.imshow(trainImg1)
+plt.show()
 
-# We iterate through our faces array and draw a rectangle
-# over each face in faces
+cam=cv2.VideoCapture("../InputData/cc2fCut.avi")
+while True:
+    ret, QueryImgBGR=cam.read()
+    QueryImg=cv2.cvtColor(QueryImgBGR,cv2.COLOR_BGR2GRAY)
+    queryKP,queryDesc=detector.detectAndCompute(QueryImg,None)
+    matches=flann.knnMatch(queryDesc,trainDesc,k=2)
 
-for (x,y,w,h) in faces:
-    cv2.rectangle(image, (x,y), (x+w,y+h), (127,0,255), 2)
-    cv2.imshow('Face Detection', image)
-    cv2.waitKey(0)
-
+    goodMatch=[]
+    for m,n in matches:
+        if(m.distance<0.75*n.distance):
+            goodMatch.append(m)
+    if(len(goodMatch)>MIN_MATCH_COUNT):
+        tp=[]
+        qp=[]
+        for m in goodMatch:
+            tp.append(trainKP[m.trainIdx].pt)
+            qp.append(queryKP[m.queryIdx].pt)
+        tp,qp=np.float32((tp,qp))
+        H,status=cv2.findHomography(tp,qp,cv2.RANSAC,3.0)
+        h,w=trainImg.shape
+        trainBorder=np.float32([[[0,0],[0,h-1],[w-1,h-1],[w-1,0]]])
+        queryBorder=cv2.perspectiveTransform(trainBorder,H)
+        cv2.polylines(QueryImgBGR,[np.int32(queryBorder)],True,(0,255,0),5)
+        print("Match Found")
+    else:
+        print("Not Enough match found-")
+        print(len(goodMatch),MIN_MATCH_COUNT)
+    cv2.imshow('result',QueryImgBGR)
+    if cv2.waitKey(10)==ord('v'):
+        break
+cam.release()
 cv2.destroyAllWindows()
