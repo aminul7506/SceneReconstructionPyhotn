@@ -59,10 +59,11 @@ if __name__ == '__main__':
     ok = tracker.init(frame, bbox)
     change_x = 0
     change_y = 0
-    change_total_in_a_unit = 0
+    distance_covered_in_a_unit = 0
     bbox_prev = bbox
 
     # determining polynomial coefficients for x and y
+    # todo -> keep this values in a file
     input_values_in_camera_in_pixel_in_x = [114, 228, 342, 456, 570, 684, 798]
     output_values_in_camera_in_a_unit_in_x = [0.8, 1.7, 2.7, 3.8, 4.8, 5.7, 6.5]
     input_values_in_camera_in_pixel_in_y = [50, 100, 150, 200, 250, 300, 350, 400, 450]
@@ -74,6 +75,10 @@ if __name__ == '__main__':
     polynomial_coefficients_in_y = utils.coefficients_of_polynomial(input_values_in_camera_in_pixel_in_y,
                                                                     output_values_in_camera_in_a_unit_in_y,
                                                                     polynomial_degree)
+    frame_count_for_object = 0
+    frame_per_second = utils.get_frame_per_second_of_a_video(video, major_ver)
+
+    print("------------------------------------- frame reading started -----------------------------------------")
     while True:
         # Read a new frame
         ok, frame = video.read()
@@ -119,12 +124,12 @@ if __name__ == '__main__':
             change_of_centroid_in_y_in_a_unit = abs(centroid_y_of_bbox_in_a_unit - centroid_y_of_bbox_in_a_unit_prev)
 
             # calculate total diff in current frame in a unit
-            change_total_in_a_unit += ((centroid_x_of_bbox_in_a_unit - centroid_x_of_bbox_in_a_unit_prev) ** 2 +
-                                       (centroid_y_of_bbox_in_a_unit - centroid_y_of_bbox_in_a_unit_prev)
-                                       ** 2) ** 0.5
-            print(change_total_in_a_unit)
-
+            distance_covered_in_a_unit += ((centroid_x_of_bbox_in_a_unit - centroid_x_of_bbox_in_a_unit_prev) ** 2 +
+                                           (centroid_y_of_bbox_in_a_unit - centroid_y_of_bbox_in_a_unit_prev)
+                                           ** 2) ** 0.5
+            # update variables
             bbox_prev = bbox
+            frame_count_for_object += 1
         else:
             # Tracking failure
             cv2.putText(frame, "Tracking failure detected", (100, 80), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 0, 255), 2)
@@ -142,3 +147,14 @@ if __name__ == '__main__':
         k = cv2.waitKey(1) & 0xff
         if k == 27:
             break
+
+    print("------------------------------------- frame reading ended -----------------------------------------")
+
+    # calculate velocity
+    total_present_time_in_seconds_for_object = frame_count_for_object / frame_per_second
+    average_velocity_of_the_input_object = distance_covered_in_a_unit / total_present_time_in_seconds_for_object
+
+    # print info
+    print("Total distance covered in a unit by the object :", distance_covered_in_a_unit)
+    print("Total present time in seconds in the video by the object :", total_present_time_in_seconds_for_object)
+    print("Average velocity of the object in the video file in unit per second :", average_velocity_of_the_input_object)

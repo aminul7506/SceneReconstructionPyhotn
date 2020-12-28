@@ -3,3 +3,4 @@ venv
 /.DS_Store
 /InputData/.DS_Store/
 YOLOPreTrainedModel
+Source/.DS_store
