@@ -21,3 +21,13 @@ def get_frame_per_second_of_a_video(video, major_ver):
         return video.get(cv2.cv.CV_CAP_PROP_FPS)
     else:
         return video.get(cv2.CAP_PROP_FPS)
+
+
+def pixel_to_unit_converter_data(file_name):
+    file = open(file_name, "r")
+    array = []
+    for line in file:
+        res = [float(i) for i in line.split()]
+        array.append(res)
+    file.close()
+    return array

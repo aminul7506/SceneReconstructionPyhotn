@@ -63,11 +63,11 @@ if __name__ == '__main__':
     bbox_prev = bbox
 
     # determining polynomial coefficients for x and y
-    # todo -> keep this values in a file
-    input_values_in_camera_in_pixel_in_x = [114, 228, 342, 456, 570, 684, 798]
-    output_values_in_camera_in_a_unit_in_x = [0.8, 1.7, 2.7, 3.8, 4.8, 5.7, 6.5]
-    input_values_in_camera_in_pixel_in_y = [50, 100, 150, 200, 250, 300, 350, 400, 450]
-    output_values_in_camera_in_a_unit_in_y = [0.8, 1.65, 2.55, 3.5, 4.5, 5.55, 6.65, 7.8, 9]
+    array_of_pixel_to_unit_data = utils.pixel_to_unit_converter_data("../InputData/pixel_to_unit.txt")
+    input_values_in_camera_in_pixel_in_x = array_of_pixel_to_unit_data[0]
+    output_values_in_camera_in_a_unit_in_x = array_of_pixel_to_unit_data[1]
+    input_values_in_camera_in_pixel_in_y = array_of_pixel_to_unit_data[2]
+    output_values_in_camera_in_a_unit_in_y = array_of_pixel_to_unit_data[3]
     polynomial_degree = 4
     polynomial_coefficients_in_x = utils.coefficients_of_polynomial(input_values_in_camera_in_pixel_in_x,
                                                                     output_values_in_camera_in_a_unit_in_x,
