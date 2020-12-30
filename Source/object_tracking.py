@@ -9,7 +9,7 @@ if __name__ == '__main__':
 
     # trackers
     tracker_types = ['BOOSTING', 'MIL', 'KCF', 'TLD', 'MEDIANFLOW', 'GOTURN', 'MOSSE', 'CSRT']
-    tracker_type = tracker_types[7]
+    tracker_type = tracker_types[6]
 
     # set tracker
     if int(major_ver) < 4 and int(minor_ver) < 3:
@@ -35,25 +35,26 @@ if __name__ == '__main__':
     if tracker is None:
         tracker = cv2.TrackerMIL_create()
 
-    # Read video
+    # Open video
     video = cv2.VideoCapture("../InputData/cc2fCut.avi")
-
     # Exit if video not opened.
     if not video.isOpened():
         print("Could not open video")
         sys.exit()
 
-    # Read first frame.
+    print("------------------------------------- frame reading started -----------------------------------------")
+
+    # detection started
+    # detect input object in video
+    input_image = cv2.imread("../InputData/zahid1.png", 0)
+    bbox = utils.compute_first_detection_boundary_box(video, input_image, True)
+
+    # tracking started
+    # Read next frame after detection
     ok, frame = video.read()
     if not ok:
         print('Cannot read video file')
         sys.exit()
-
-    # Define an initial bounding box
-    bbox = (407, 70, 40, 120)  # input here the bbox from object detection bounding box
-
-    # Uncomment the line below to select a different bounding box
-    # bbox = cv2.selectROI(frame, False)
 
     # Initialize tracker with first frame and bounding box
     ok = tracker.init(frame, bbox)
@@ -78,7 +79,6 @@ if __name__ == '__main__':
     frame_count_for_object = 0
     frame_per_second = utils.get_frame_per_second_of_a_video(video, major_ver)
 
-    print("------------------------------------- frame reading started -----------------------------------------")
     while True:
         # Read a new frame
         ok, frame = video.read()
