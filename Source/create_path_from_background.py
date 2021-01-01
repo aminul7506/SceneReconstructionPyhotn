@@ -6,7 +6,7 @@ from Source import utils
 # click event for mouse
 def click_event(event, x, y, flags, param):
     if event == cv2.EVENT_LBUTTONDOWN:
-        print(x, ",", y)
+        print("Point clicked in pixel (" + str(x) + ",", str(y) + ")")
         global points_on_path_size
         points_on_path.append([x, y])
         points_on_path_size += 1
@@ -14,10 +14,15 @@ def click_event(event, x, y, flags, param):
             cv2.line(image, (points_on_path[points_on_path_size - 2][0], points_on_path[points_on_path_size - 2][1]),
                      (points_on_path[points_on_path_size - 1][0], points_on_path[points_on_path_size - 1][1]),
                      (255, 0, 0), 2)
-        cv2.imshow("image", image)
+        elif points_on_path_size == 1:
+            cv2.line(image, (points_on_path[points_on_path_size - 1][0], points_on_path[points_on_path_size - 1][1]),
+                     (points_on_path[points_on_path_size - 1][0], points_on_path[points_on_path_size - 1][1]),
+                     (255, 0, 0), 2)
+
+        cv2.imshow(input_file_name, image)
 
     if event == cv2.EVENT_RBUTTONDOWN:
-        cv2.imshow("image", image)
+        cv2.imshow(input_file_name, image)
 
 
 # init variables
@@ -26,11 +31,15 @@ points_on_path_size = 0
 total_distance_in_an_unit = 0
 
 # read image
-image = cv2.imread("../InputData/background_image.png")
-cv2.imshow("image", image)
+input_directory = "../InputData"
+input_file_name = "background_image"
+input_file_extension = ".png"
+input_file_path = input_directory + "/" + input_file_name + input_file_extension
+image = cv2.imread(input_file_path)
+cv2.imshow(input_file_name, image)
 
 # mouse callback
-cv2.setMouseCallback("image", click_event)
+cv2.setMouseCallback(input_file_name, click_event)
 
 # clear windows
 cv2.waitKey(0)
@@ -50,4 +59,10 @@ for i in range(points_on_path_size):
                                                                                          points_on_path[i][0],
                                                                                          points_on_path[i][1])
 
-print("Total distance covered by the path in an unit:", total_distance_in_an_unit)
+# save the image with path specification
+output_file_directory = "../OutputData"
+output_file_name = input_file_name + "_with_path"
+output_file_path = output_file_directory + "/" + output_file_name + input_file_extension
+cv2.imwrite(output_file_path, image)
+
+print("Total distance covered by the path in an unit :", total_distance_in_an_unit)
