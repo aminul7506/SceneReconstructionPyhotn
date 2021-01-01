@@ -33,6 +33,31 @@ def pixel_to_unit_converter_data(file_name):
     return array
 
 
+def determine_polynomial_coefficient_in_x_y(file_name):
+    array_of_pixel_to_unit_data = pixel_to_unit_converter_data(file_name)
+    input_values_in_camera_in_pixel_in_x = array_of_pixel_to_unit_data[0]
+    output_values_in_camera_in_a_unit_in_x = array_of_pixel_to_unit_data[1]
+    input_values_in_camera_in_pixel_in_y = array_of_pixel_to_unit_data[2]
+    output_values_in_camera_in_a_unit_in_y = array_of_pixel_to_unit_data[3]
+    polynomial_degree = 4
+    polynomial_coefficients_in_x = coefficients_of_polynomial(input_values_in_camera_in_pixel_in_x,
+                                                              output_values_in_camera_in_a_unit_in_x,
+                                                              polynomial_degree)
+    polynomial_coefficients_in_y = coefficients_of_polynomial(input_values_in_camera_in_pixel_in_y,
+                                                              output_values_in_camera_in_a_unit_in_y,
+                                                              polynomial_degree)
+    return polynomial_coefficients_in_x, polynomial_coefficients_in_y
+
+
+def calculate_difference_of_two_points_in_a_unit(polynomial_coefficients_in_x, polynomial_coefficients_in_y, x1, y1, x2, y2):
+    x2_in_a_unit = get_value_from_four_degree_polynomial(polynomial_coefficients_in_x, x2)
+    y2_in_a_unit = get_value_from_four_degree_polynomial(polynomial_coefficients_in_y, y2)
+    x1_in_a_unit = get_value_from_four_degree_polynomial(polynomial_coefficients_in_x, x1)
+    y1_in_a_unit = get_value_from_four_degree_polynomial(polynomial_coefficients_in_y, y1)
+
+    return ((x2_in_a_unit - x1_in_a_unit) ** 2 + (y2_in_a_unit - y1_in_a_unit) ** 2) ** 0.5
+
+
 def compute_first_detection_boundary_box(video, input_image, show_image):
     MIN_MATCH_COUNT = 20
     THRESHOLD_DIFF_IN_BOUNDARY_BOX = 20
@@ -76,7 +101,7 @@ def compute_first_detection_boundary_box(video, input_image, show_image):
             diff3 = abs(queryBorder[0][0][1] - queryBorder[0][3][1])
             diff4 = abs(queryBorder[0][1][1] - queryBorder[0][2][1])
 
-            if diff1 <= THRESHOLD_DIFF_IN_BOUNDARY_BOX and diff2 <= THRESHOLD_DIFF_IN_BOUNDARY_BOX\
+            if diff1 <= THRESHOLD_DIFF_IN_BOUNDARY_BOX and diff2 <= THRESHOLD_DIFF_IN_BOUNDARY_BOX \
                     and diff3 <= THRESHOLD_DIFF_IN_BOUNDARY_BOX and diff4 <= THRESHOLD_DIFF_IN_BOUNDARY_BOX:
                 top_left_coordinate_x = int(queryBorder[0][0][0])
                 top_left_coordinate_y = int(queryBorder[0][0][1])
