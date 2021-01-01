@@ -60,7 +60,7 @@ if __name__ == '__main__':
     ok = tracker.init(frame, bbox)
     change_x = 0
     change_y = 0
-    distance_covered_in_a_unit = 0
+    distance_covered_in_an_unit = 0
     bbox_prev = bbox
 
     # determining polynomial coefficients for x and y
@@ -98,8 +98,8 @@ if __name__ == '__main__':
             centroid_x_of_bbox_prev = bbox_prev[0] + bbox_prev[2] / 2
             centroid_y_of_bbox_prev = bbox_prev[1] + bbox_prev[3] / 2
 
-            # calculate total diff from prev to current frame in a unit
-            distance_covered_in_a_unit += utils.calculate_difference_of_two_points_in_a_unit \
+            # calculate total diff from prev to current frame in an unit
+            distance_covered_in_an_unit += utils.calculate_difference_of_two_points_in_an_unit \
                 (polynomial_coefficients_in_x, polynomial_coefficients_in_y, centroid_x_of_bbox,
                  centroid_y_of_bbox, centroid_x_of_bbox_prev, centroid_y_of_bbox_prev)
 
@@ -128,9 +128,9 @@ if __name__ == '__main__':
 
     # calculate velocity
     total_present_time_in_seconds_for_object = frame_count_for_object / frame_per_second
-    average_velocity_of_the_input_object = distance_covered_in_a_unit / total_present_time_in_seconds_for_object
+    average_velocity_of_the_input_object = distance_covered_in_an_unit / total_present_time_in_seconds_for_object
 
     # print info
-    print("Total distance covered in a unit by the object :", distance_covered_in_a_unit)
+    print("Total distance covered in an unit by the object :", distance_covered_in_an_unit)
     print("Total present time in seconds in the video by the object :", total_present_time_in_seconds_for_object)
     print("Average velocity of the object in the video file in unit per second :", average_velocity_of_the_input_object)

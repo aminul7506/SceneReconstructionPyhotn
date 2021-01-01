@@ -7,12 +7,13 @@ from Source import utils
 def click_event(event, x, y, flags, param):
     if event == cv2.EVENT_LBUTTONDOWN:
         print(x, ",", y)
-        global points_of_path_size
+        global points_on_path_size
         points_on_path.append([x, y])
-        points_of_path_size += 1
-        if points_of_path_size > 1:
-            cv2.line(image, (points_on_path[points_of_path_size - 2][0], points_on_path[points_of_path_size - 2][1]),
-                     (points_on_path[points_of_path_size - 1][0], points_on_path[points_of_path_size - 1][1]), (255, 0, 0), 2)
+        points_on_path_size += 1
+        if points_on_path_size > 1:
+            cv2.line(image, (points_on_path[points_on_path_size - 2][0], points_on_path[points_on_path_size - 2][1]),
+                     (points_on_path[points_on_path_size - 1][0], points_on_path[points_on_path_size - 1][1]),
+                     (255, 0, 0), 2)
         cv2.imshow("image", image)
 
     if event == cv2.EVENT_RBUTTONDOWN:
@@ -21,8 +22,8 @@ def click_event(event, x, y, flags, param):
 
 # init variables
 points_on_path = []
-points_of_path_size = 0
-total_distance_in_a_unit = 0
+points_on_path_size = 0
+total_distance_in_an_unit = 0
 
 # read image
 image = cv2.imread("../InputData/background_image.png")
@@ -39,13 +40,14 @@ cv2.destroyAllWindows()
 polynomial_coefficients_in_x, polynomial_coefficients_in_y = \
     utils.determine_polynomial_coefficient_in_x_y("../InputData/pixel_to_unit.txt")
 
-# calculate total path distance pointed by mouse in a unit
-for i in range(points_of_path_size):
+# calculate total path distance pointed by mouse in an unit
+for i in range(points_on_path_size):
     if i > 0:
-        total_distance_in_a_unit += utils.calculate_difference_of_two_points_in_a_unit(polynomial_coefficients_in_x,
-                                                                                       polynomial_coefficients_in_y,
-                                                                                       points_on_path[i - 1][0],
-                                                                                       points_on_path[i - 1][1], points_on_path[i][0],
-                                                                                       points_on_path[i][1])
+        total_distance_in_an_unit += utils.calculate_difference_of_two_points_in_an_unit(polynomial_coefficients_in_x,
+                                                                                         polynomial_coefficients_in_y,
+                                                                                         points_on_path[i - 1][0],
+                                                                                         points_on_path[i - 1][1],
+                                                                                         points_on_path[i][0],
+                                                                                         points_on_path[i][1])
 
-print(total_distance_in_a_unit)
+print("Total distance covered by the path in an unit:", total_distance_in_an_unit)
