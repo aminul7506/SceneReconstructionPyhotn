@@ -119,3 +119,39 @@ def compute_first_detection_boundary_box(video, input_image, show_image):
                 break
 
     return [0, 0, 0, 0]
+
+
+def save_distance_along_with_path_info_in_a_txt_file(file_name, points_on_path, total_distance_in_an_unit):
+    file_for_output_path_info = open(file_name, "w")
+    total_path_length_in_an_unit_up_to_two_decimal_in_str = str(round(total_distance_in_an_unit, 2)) + "\n"
+    file_for_output_path_info.write(total_path_length_in_an_unit_up_to_two_decimal_in_str)
+    for point in points_on_path:
+        point_in_str = str(int(point[0])) + " " + str(int(point[1])) + "\n"
+        file_for_output_path_info.write(point_in_str)
+    file_for_output_path_info.close()
+
+
+def create_video_file_from_images(image_array, file_path, image_width, image_height, frame_rate):
+    dimension = (image_width, image_height)
+    fourcc = cv2.VideoWriter_fourcc(*'avc1')
+    video = cv2.VideoWriter(file_path, fourcc, frame_rate, dimension)
+    for image in image_array:
+        video.write(image)
+    video.release()
+
+
+def read_distance_pixel_data_from_path_specified_file(file_path):
+    file = open(file_path, "r")
+    total_distance = 0
+    pixel_array = []
+    index = 0
+    for line in file:
+        if index == 0:
+            res = [float(i) for i in line.split()]
+            total_distance = res[0]
+        else:
+            res = [int(i) for i in line.split()]
+            pixel_array.append(res)
+        index += 1
+    file.close()
+    return total_distance, pixel_array
