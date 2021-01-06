@@ -58,8 +58,6 @@ if __name__ == '__main__':
 
     # Initialize tracker with first frame and bounding box
     ok = tracker.init(frame, bbox)
-    change_x = 0
-    change_y = 0
     distance_covered_in_an_unit = 0
     bbox_prev = bbox
 

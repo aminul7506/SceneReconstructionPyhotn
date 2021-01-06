@@ -68,6 +68,7 @@ cv2.imwrite(output_file_path, image)
 # save pixel info into a .txt file
 path_pixel_output_file_path = output_file_directory + "/" + output_file_name + ".txt"
 utils.save_distance_along_with_path_info_in_a_txt_file(path_pixel_output_file_path, points_on_path,
-                                                       total_distance_in_an_unit)
+                                                       total_distance_in_an_unit,
+                                                       polynomial_coefficients_in_x, polynomial_coefficients_in_y)
 
 print("Total distance covered by the path in an unit :", total_distance_in_an_unit)
