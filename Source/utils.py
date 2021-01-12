@@ -100,7 +100,7 @@ def construct_object_movement_array_from_path_array(path_array, total_frame_coun
                     change_next = True
             movement_array.append([x, y])
             current_pixel_from_path = [x, y]
-            if change_next and index_in_next_pixel_in_path_array < length_path_array - 1:
+            if change_next and index_in_next_pixel_in_path_array <= length_path_array - 1:
                 index_in_next_pixel_in_path_array += 1
                 next_pixel_from_path = path_array[index_in_next_pixel_in_path_array]
             print("x & y value in pixel in object movement array : (x,y) (" + str(x) + "," + str(y) + ")")
@@ -276,3 +276,39 @@ def read_distance_pixel_data_from_path_specified_file(file_path):
         index += 1
     file.close()
     return total_distance, polynomial_coefficients_in_x, polynomial_coefficients_in_y, pixel_array
+
+
+def calculate_object_width_for_a_frame(change_of_object_size_per_pixel_along_width, current_image_width,
+                                       position_in_current_frame, position_in_next_frame, background_image_width):
+    current_frame_x_position = position_in_current_frame[0]
+    next_frame_x_position = position_in_next_frame[0]
+    current_image_center_x = background_image_width / 2
+    change_along_x = 0
+    print(position_in_current_frame[0], position_in_next_frame[0], current_image_center_x)
+    if current_frame_x_position == next_frame_x_position:
+        change_along_x = 0
+    elif current_frame_x_position <= current_image_center_x <= next_frame_x_position:
+        change_along_x = change_of_object_size_per_pixel_along_width * \
+                         (current_image_center_x - current_frame_x_position) + \
+                         change_of_object_size_per_pixel_along_width * \
+                         (current_image_center_x - next_frame_x_position)
+    elif current_frame_x_position >= current_image_center_x >= next_frame_x_position:
+        change_along_x = change_of_object_size_per_pixel_along_width * \
+                         (current_frame_x_position - current_image_center_x) + \
+                         change_of_object_size_per_pixel_along_width * \
+                         (next_frame_x_position - current_image_center_x)
+    elif current_frame_x_position < current_image_center_x and next_frame_x_position < current_image_center_x:
+        change_along_x = change_of_object_size_per_pixel_along_width * (
+                    next_frame_x_position - current_frame_x_position)
+    elif current_frame_x_position > current_image_center_x and next_frame_x_position > current_image_center_x:
+        change_along_x = change_of_object_size_per_pixel_along_width * (
+                    current_frame_x_position -  next_frame_x_position)
+    return current_image_width + change_along_x
+
+
+def calculate_object_height_for_a_frame(change_of_object_size_per_pixel_along_height, current_image_height,
+                                        position_in_current_frame, position_in_next_frame):
+    current_frame_y_position = position_in_current_frame[1]
+    next_frame_y_position = position_in_next_frame[1]
+    return current_image_height + change_of_object_size_per_pixel_along_height * \
+           (next_frame_y_position - current_frame_y_position)

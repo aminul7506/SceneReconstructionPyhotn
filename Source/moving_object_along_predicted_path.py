@@ -10,7 +10,7 @@ output_directory = "../OutputData"
 image_input_file_name = "background_image"
 image_input_file_name_remaining = "_with_path"
 image_input_file_extension = ".png"
-image_input_file_path = output_directory + "/" + image_input_file_name + image_input_file_name_remaining\
+image_input_file_path = output_directory + "/" + image_input_file_name + image_input_file_name_remaining \
                         + image_input_file_extension
 background_image = Image.open(image_input_file_path)
 
@@ -38,9 +38,26 @@ movement_array_in_pixel = utils.construct_object_movement_array_from_path_array(
 
 # construct image array to insert into video file
 image_array = []
-for point in movement_array_in_pixel:
+input_image_width_fraction, input_image_height_fraction = input_image.size
+length_of_movement_array = len(movement_array_in_pixel)
+
+change_of_object_size_per_pixel_along_width = .1  # todo -> calibrate it
+change_of_object_size_per_pixel_along_height = .1  # todo -> calibrate it
+
+for i in range(length_of_movement_array):
+    point = movement_array_in_pixel[i]
     back_im = background_image.copy()
-    back_im.paste(input_image, (int(point[0]), int(point[1])))
+
+    if i > 0:
+        input_image_height_fraction = utils.calculate_object_height_for_a_frame(
+            change_of_object_size_per_pixel_along_height,
+            input_image_height_fraction,
+            movement_array_in_pixel[i - 1], point)
+
+        input_image = input_image.resize((int(input_image_width_fraction), int(input_image_height_fraction)))
+
+    back_im.paste(input_image, (int(point[0] - input_image_width_fraction / 2),
+                                int(point[1] - input_image_height_fraction)))
     cv2_image = cv2.cvtColor(np.array(back_im), cv2.COLOR_RGB2BGR)
     image_array.append(cv2_image)
 
